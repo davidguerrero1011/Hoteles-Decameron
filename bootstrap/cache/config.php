@@ -275,7 +275,7 @@
   ),
   'database' => 
   array (
-    'default' => 'psql',
+    'default' => 'pgsql',
     'connections' => 
     array (
       'sqlite' => 
@@ -640,13 +640,13 @@
     ),
     'batching' => 
     array (
-      'database' => 'psql',
+      'database' => 'pgsql',
       'table' => 'job_batches',
     ),
     'failed' => 
     array (
       'driver' => 'database-uuids',
-      'database' => 'psql',
+      'database' => 'pgsql',
       'table' => 'failed_jobs',
     ),
   ),
