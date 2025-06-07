@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::prefix('hotels')->group(function() {
+    Route::get('/', function() {
+        return "Laravel esta funcionando bien en Railway";
+    });
     Route::get('/list', [HotelController::class, 'index'])->name('hotels.list');
     Route::post('/store', [HotelController::class, 'store'])->name('hotels.store');
     Route::get('/show/{id}', [HotelController::class, 'show'])->name('hotels.show');
