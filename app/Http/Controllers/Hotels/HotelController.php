@@ -21,18 +21,27 @@ class HotelController extends Controller
      */
     public function index()
     {
-        $hotels = $this->hotel->index();
         try {
-            if ($hotels->isEmpty()) {
-                return response()->json(['state' => 204, 'message' => 'Todavia no hay hoteles registrados en el sistema']);
-            }
+            $hotels = $this->hotel->index();
 
-            return response()->json(['state' => 200, 'data' => $hotels]);
-        } catch (Exception $e) {
+            return response()->json([
+                'state' => 200,
+                'message' => $hotels->isEmpty()
+                    ? 'Todavía no hay hoteles registrados en el sistema'
+                    : 'Hoteles obtenidos correctamente',
+                'data' => $hotels
+            ]);
+        } catch (\Exception $e) {
             Log::info("Message Error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Ocurrio un error al intentar mostrar los registros de los hoteles.']);
+
+            return response()->json([
+                'state' => 500,
+                'message' => 'Ocurrió un error al intentar mostrar los registros de los hoteles.',
+                'data' => []
+            ], 500);
         }
     }
+
 
     /**
      * Store a newly created resource in storage.
