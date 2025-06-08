@@ -3,7 +3,7 @@
   array (
     'name' => 'Laravel',
     'env' => 'production',
-    'debug' => true,
+    'debug' => false,
     'url' => 'https://hoteles-decameron-production.up.railway.app',
     'asset_url' => NULL,
     'timezone' => 'UTC',
@@ -251,6 +251,7 @@
     array (
       0 => 'api/*',
       1 => 'sanctum/csrf-cookie',
+      2 => '*',
     ),
     'allowed_methods' => 
     array (
@@ -258,7 +259,7 @@
     ),
     'allowed_origins' => 
     array (
-      0 => '*',
+      0 => 'https://decameron-roan.vercel.app',
     ),
     'allowed_origins_patterns' => 
     array (
