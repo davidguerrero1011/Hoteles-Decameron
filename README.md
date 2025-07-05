@@ -7,60 +7,128 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# 🏨 Hoteles Decameron - Sistema de Gestión Hotelera
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Bienvenido al sistema de gestión hotelera solicitado por el gerente de operaciones. Esta aplicación permite registrar hoteles, sus datos tributarios y configurar habitaciones según reglas definidas por tipo y acomodación.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Descripción del proyecto
 
-## Learning Laravel
+El sistema permite:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Registrar hoteles con nombre, dirección, ciudad, NIT y número de habitaciones.
+- Asignar **tipos de habitación** con su respectiva **acomodación**, respetando estas reglas:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+| Tipo de habitación | Acomodaciones válidas         |
+|--------------------|-------------------------------|
+| Estándar           | Sencilla, Doble               |
+| Junior             | Triple, Cuádruple             |
+| Suite              | Sencilla, Doble, Triple       |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Validaciones clave:
+  - No superar la cantidad de habitaciones declaradas por hotel.
+  - No repetir hoteles.
+  - No repetir combinaciones de tipo + acomodación en el mismo hotel.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🧰 Tecnologías utilizadas
 
-### Premium Partners
+- **Backend:** Laravel 10 (PHP 8+)
+- **Frontend:** React 18 + Vite
+- **Base de datos:** PostgreSQL
+- **Diseño:** Bootstrap 5 (responsive)
+- **Testing:** PHPUnit
+- **CI/CD:** GitHub Actions
+- **Despliegue:**  (Frontend)
+- **Documentación API:** Postman (archivo incluido)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## 🧱 Arquitectura y diseño
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🔁 Patrones aplicados
 
-## Code of Conduct
+- **Repository**: para desacoplar el acceso a datos.
+- **Service Layer**: para aislar la lógica de negocio.
+- **Inversión de dependencias** con bindings en `AppServiceProvider`.
+- **Principio de responsabilidad unica** Clases, Controladores, Servicios y Repositorios.
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 📦 Estructura de carpetas
 
-## Security Vulnerabilities
+app/
+├── Http/Controllers/
+│ └── HotelController.php
+├── Services/
+│ └── HotelService.php
+├── Repositories/
+│ ├── HotelRepositoryInterface.php
+│ └── Eloquent/
+│ └── HotelRepository.php
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+📘 Documentación incluida
+    * Diagrama UML (en docs/uml_diagram.png)
+    * Archivo postman_collection.json para probar los endpoints
+    * Dump de la base de datos: database/dumps/hotel_manager_dump.sql
 
+
+🧪 Pruebas
+php artisan test
+
+
+🖥️ Despliegue
+    * Backend (API):
+    * Frontend (React):
+
+
+📦 Instalación local
+
+    1. Clona el proyecto
+        * Backend
+            git clone https://github.com/davidguerrero1011/Hoteles-Decameron.git
+            cd hotel-manager
+        
+        * Frontend
+            git clone https://github.com/davidguerrero1011/Decameron.git
+            cd decameron
+    
+    2. Configura el Backend (Laravel)
+
+        cd backend
+        * Linux
+            cp .env.example .env
+
+        * Windows
+            copy .env.example .env
+        
+        composer install
+        php artisan key:generate
+
+        # Configura tu conexión PostgreSQL en .env
+        php artisan migrate --seed
+        php artisan serve
+
+    3. Configura el Frontend (React)
+        cd frontend
+
+        * Linux
+            cp .env.example .env
+        
+        * Windows
+            copy .env.example .env
+            
+        npm install
+        npm run dev
+
+    
+    👨‍💻 Autor
+        Wilmar David Macias Guerrero
+        Desarrollador Backend PHP - Laravel
+        GitHub: @davidguerrero1011
+        Correo: davidguerrero0709@gmail.com
+
+📄 Licencia
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

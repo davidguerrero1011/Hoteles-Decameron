@@ -23,8 +23,8 @@ return new class extends Migration
             $table->unsignedBigInteger('acommodation_type_id')->comment('Foranea del tipo de acomodacion');
             $table->foreign('acommodation_type_id')->references('id')->on('acommodation_types');
 
-            $table->integer('amont')->comment('numero de cuartos configurados por tipo y acomodacion');
-            $table->boolean('status')->default(true)->comment('Estado de la configuracion de las acomodaciones por tipo');
+            $table->integer('room_number')->comment('numero de cuartos configurados por tipo y acomodacion');
+            $table->integer('floor')->comment('piso de cuartos configurados por tipo y acomodacion');
             
             $table->timestamps();
         });

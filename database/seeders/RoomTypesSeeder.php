@@ -12,9 +12,9 @@ class RoomTypesSeeder extends Seeder
      */
     public function run(): void
     {
-        $roomsType = ['Estandar', 'Junio', 'Suite'];
+        $roomsType = ['Estandar', 'Junior', 'Suite'];
         foreach ($roomsType as $room) {
-            RoomTypes::insert([ 'name' => $room ]);
+            RoomTypes::insert([ 'name' => $room, 'description' => 'Descripción tipo cuarto '. $room  ]);
         }
     }
 }

@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class RoomTypeAccommodation extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['room_type_id', 'accommodation_type_id'];
+    public $timestamps = true;
 }

@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class RoomTypes extends Model
 {
     use HasFactory;
-    protected $fillable = [ 'name', 'status' ];
-    protected $guarded = ['id'];
+    protected $fillable = [ 'name', 'description' ];
+    public $timestamps = true;
 }

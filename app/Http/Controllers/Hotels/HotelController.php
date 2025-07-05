@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Hotels;
 use App\Classes\Hotels\HotelService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Hotels\HotelRequest;
-use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class HotelController extends Controller
 {
@@ -21,25 +20,7 @@ class HotelController extends Controller
      */
     public function index()
     {
-        try {
-            $hotels = $this->hotel->index();
-
-            return response()->json([
-                'state' => 200,
-                'message' => $hotels->isEmpty()
-                    ? 'Todavía no hay hoteles registrados en el sistema'
-                    : 'Hoteles obtenidos correctamente',
-                'data' => $hotels
-            ]);
-        } catch (\Exception $e) {
-            Log::info("Message Error: " . $e->getMessage());
-
-            return response()->json([
-                'state' => 500,
-                'message' => 'Ocurrió un error al intentar mostrar los registros de los hoteles.',
-                'data' => []
-            ], 500);
-        }
+        return response()->json([$this->hotel->index()], Response::HTTP_OK);
     }
 
 
@@ -48,7 +29,8 @@ class HotelController extends Controller
      */
     public function store(HotelRequest $request)
     {
-        return $this->hotel->store($request);
+        $createHotel = $this->hotel->store($request->validated());
+        return response()->json(['message' => 'Hotel con ID '. $createHotel->id .' creado de manera exitosa'], Response::HTTP_OK);
     }
 
     /**
@@ -56,15 +38,10 @@ class HotelController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function show(string $id)
+    public function show(int $id)
     {
-        try {
-            $hotelDetail = $this->hotel->show($id);
-            return response()->json(['state' => 200, 'data' => $hotelDetail]);
-        } catch (\Throwable $e) {
-            Log::info("error message: " . $e->get->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Algo ocurrio al intentar mostrar el detalle del hotel']);
-        }
+        $hotelDetail = $this->hotel->show($id);
+        return response()->json([$hotelDetail], Response::HTTP_OK);
     }
 
     /**
@@ -72,7 +49,8 @@ class HotelController extends Controller
      */
     public function update(HotelRequest $request, int $id)
     {
-        return $this->hotel->update($request, $id);
+        $this->hotel->update($request->validated(), $id);
+        return response()->json(['message' => 'Hotel con ID '. $id .' actualizado de manera exitosa'], Response::HTTP_OK);
     }
 
     /**
@@ -80,7 +58,8 @@ class HotelController extends Controller
      */
     public function destroy(int $id)
     {
-        return $this->hotel->destroy($id);
+        $this->hotel->destroy($id);
+        return response()->json(['message' => 'Hotel borrado exitosamente.'], Response::HTTP_OK);
     }
 
     /**
@@ -98,14 +77,9 @@ class HotelController extends Controller
      * 
      *  @return \Illuminate\Http\Response
      */
-    public function cities(int $id)
+    public function cities()
     {
-        try {
-            return response()->json(['state' => 201, 'data' => $this->hotel->cities($id)]);
-        } catch (Exception $e) {
-            Log::info("message error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Ocurrio algo listado las ciudades']);
-        }
+        return response()->json([$this->hotel->cities()], Response::HTTP_OK);
     }
 
     /**
@@ -115,13 +89,8 @@ class HotelController extends Controller
      */
     public function roomTypes()
     {
-        try {
-            $roomTypes = $this->hotel->roomTypes();
-            return response()->json(['state' => 200, 'data' => $roomTypes]);
-        } catch (Exception $e) {
-            Log::info("message error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Hubo algún inconveniente listando los tipos de cuartos']);
-        }
+        $roomTypes = $this->hotel->roomTypes();
+        return response()->json([$roomTypes], Response::HTTP_OK);
     }
 
     /**
@@ -131,12 +100,7 @@ class HotelController extends Controller
      */
     public function accommodationTypes(int $roomTypeId)
     {
-        try {
-            $roomTypes = $this->hotel->accommodationTypes($roomTypeId);
-            return response()->json(['state' => 200, 'data' => $roomTypes]);
-        } catch (Exception $e) {
-            Log::info("message error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Hubo algún incoveniente listando las acomodaciones']);
-        }
+        $roomTypes = $this->hotel->accommodationTypes($roomTypeId);
+        return response()->json([$roomTypes], Response::HTTP_OK);
     }
 }

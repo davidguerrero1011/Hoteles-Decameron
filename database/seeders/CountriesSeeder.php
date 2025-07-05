@@ -12,9 +12,7 @@ class CountriesSeeder extends Seeder
      */
     public function run(): void
     {
-        $countries = ['Colombia'];
-        foreach ($countries as $country) {
-            Countries::insert([ 'name' => $country ]);
-        }
+        $countries = ['name' => 'Colombia'];
+        Countries::create($countries);
     }
 }

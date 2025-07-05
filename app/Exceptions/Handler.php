@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Throwable;
+use TypeError;
 
 class Handler extends ExceptionHandler
 {
@@ -26,5 +28,27 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e) : JsonResponse
+    {
+        if ($request->expectsJson()) {
+            
+            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                return response()->json(['error' => 'Recurso no encontrado'], 404);
+            }
+
+            if ($e instanceof TypeError) {
+                return response()->json([
+                                            'message' => 'El recurso enviando no es correcto, asegurese de que esta enviando lo correcto',
+                                            'error'   => app()->isLocal() ? $e->getMessage() : null
+                                        ], 422);
+            }
+
+            // return response()->json(['message' => app()->isLocal() ? $e->getMessage() : 'Error en el servidor'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+        return parent::render($request, $e);
     }
 }

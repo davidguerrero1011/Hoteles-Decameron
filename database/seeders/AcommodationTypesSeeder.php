@@ -13,8 +13,8 @@ class AcommodationTypesSeeder extends Seeder
     public function run(): void
     {
         $roomsType = ['Cuadruple', 'Triple', 'Doble', 'Sencilla'];
-        foreach ($roomsType as $room) {
-            AcommodationTypes::insert([ 'name' => $room, 'created_at' => now(), 'updated_at' => now() ]);
+        foreach ($roomsType as $type) {
+            AcommodationTypes::create(['name' => $type]);
         }
     }
 }

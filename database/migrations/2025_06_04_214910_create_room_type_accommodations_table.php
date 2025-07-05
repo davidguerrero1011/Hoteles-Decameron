@@ -20,7 +20,6 @@ return new class extends Migration
             $table->unsignedBigInteger('accommodation_type_id')->comment('Foranea hacia tipos de acomodaciones');
             $table->foreign('accommodation_type_id')->references('id')->on('acommodation_types');
 
-             $table->boolean('status')->default(true)->comment('Estado de la configuracion de las acomodaciones por tipo');
             $table->timestamps();
         });
     }

@@ -9,5 +9,5 @@ class Countries extends Model
 {
     use HasFactory;
     protected $fillable = [ 'name', 'status' ];
-    protected $guarded = ['id'];
+    public $timestamps = true;
 }

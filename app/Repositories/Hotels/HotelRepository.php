@@ -2,16 +2,16 @@
 
 namespace App\Repositories\Hotels;
 
-use App\Http\Requests\Hotels\HotelRequest;
 use App\Interfaces\Hotels\HotelInterface;
 use App\Models\Cities;
+use App\Models\Countries;
 use App\Models\HotelRoomConfigurations;
 use App\Models\Hotels;
 use App\Models\RoomTypeAccommodation;
 use App\Models\RoomTypes;
-use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class HotelRepository implements HotelInterface
 {
@@ -34,27 +34,20 @@ class HotelRepository implements HotelInterface
      * @return \Illuminate\Http\Response
      * @param $request
      */
-    public function store(Request $request)
+    public function store(array $request)
     {
-        try {
-            $validate = $request->validated();
+        $existHotel = $this->hotels::where(function ($query) use ($request) {
+            $query->where('name', 'LIKE', '%' . $request['name'] . '%')
+                ->orWhere('nit', 'LIKE', '%' . $request['nit'] . '%');
+        })->exists();
 
-            $existHotel = $this->hotels::where(function ($query) use ($validate) {
-                $query->where('name', 'LIKE', '%' . $validate['name'] . '%')
-                    ->orWhere('nit', 'LIKE', '%' . $validate['nit'] . '%');
-            })->exists();
-
-            if ($existHotel) {
-                return response()->json(['state' => 409, 'message' => 'El hotel ya existe, no puede crear un hotel con el mismo nombre.']);
-            }
-
-            $validate['status'] = filter_var($validate['status'], FILTER_VALIDATE_BOOLEAN);
-            Hotels::create($validate);
-            return response()->json(['state' => 200, 'message' => 'Fue creado de manera exitosa el hotel.']);
-        } catch (Exception $e) {
-            Log::info("Message Error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Ocurrio algún suceso a la hora de crear el hotel.']);
+        if ($existHotel) {
+            return response()->json(['message' => 'Este hotel con nombre o nit ya existe, debe crear uno nuevo.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+        
+        $request['status'] = isset($request['status']) && $request['status'] == 1 ? 1 : 0;
+        Log::info("status final: " . $request['status']);
+        return Hotels::create($request);
     }
 
     /**
@@ -63,7 +56,7 @@ class HotelRepository implements HotelInterface
      * @return \Illuminate\Http\Response
      * @param $id
      */
-    public function show($id)
+    public function show(int $id)
     {
         return $this->hotels::where('id', $id)->first();
     }
@@ -74,18 +67,13 @@ class HotelRepository implements HotelInterface
      * @return \Illuminate\Http\Response
      * @param $id, $request
      */
-    public function update(HotelRequest $request, int $id)
+    public function update(array $request, int $id)
     {
-        $validate = $request->validated();
-        try {
-            $hotelUpdate = $this->hotels::find($id);
-            $hotelUpdate->update($validate);
+        $hotelUpdate = $this->hotels::find($id);
+        $request["status"] = $request["status"] == 1 ? 0 : 1;
+        $hotelUpdate->update($request);
 
-            return response()->json(['state' => 200, 'message' => 'La información del hotel fue actualizada con exito.']);
-        } catch (Exception $e) {
-            Log::info("error message: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Hubo algún incoveniente actualizando la información del hotel.']);
-        }
+        return $hotelUpdate;
     }
 
     /**
@@ -96,15 +84,9 @@ class HotelRepository implements HotelInterface
      */
     public function destroy(int $id)
     {
-        try {
-            $this->hotelRoomConfigurations::where('hotel_id', $id)->delete();
-            $this->hotels::where('id', $id)->delete();
-
-            return response()->json(['state' => 200, 'message' => 'El hotel con su respectiva configuracion fue borrado exitosamente.']);
-        } catch (Exception $e) {
-            Log::info("error message: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Hubo un inconveniente en eñ borrado del hotel.']);
-        }
+        $this->hotelRoomConfigurations::where('hotel_id', $id)->delete();
+        $deleteHotel = $this->hotels::where('id', $id)->delete();
+        return $deleteHotel;
     }
 
     /**
@@ -115,58 +97,53 @@ class HotelRepository implements HotelInterface
      */
     public function assign(Request $request)
     {
-        try {
-            $hotelId = $request->hotel_id;
-            $roomTypeId = $request->room_type_id;
-            $accommodationId = $request->acommodation_type_id;
-            $amount = $request->amont;
+        $hotelId = $request->hotel_id;
+        $roomTypeId = $request->room_type_id;
+        $accommodationId = $request->acommodation_type_id;
+        $amount = $request->amont;
 
-            $invalidAccommodation = RoomTypeAccommodation::where([
-                ['room_type_id', $roomTypeId],
-                ['accommodation_type_id', $accommodationId]
-            ])->doesntExist();
+        $invalidAccommodation = RoomTypeAccommodation::where([
+            ['room_type_id', $roomTypeId],
+            ['accommodation_type_id', $accommodationId]
+        ])->doesntExist();
 
-            if ($invalidAccommodation) {
-                return response()->json(['state' => 204, 'message' => 'La acomodación no esta configurada al tipo de habitación.']);
-            }
-
-            $duplicateConfig = $this->hotelRoomConfigurations::where([
-                ['hotel_id', $hotelId],
-                ['room_type_id', $roomTypeId],
-                ['acommodation_type_id', $accommodationId]
-            ])->exists();
-
-            if ($duplicateConfig) {
-                return response()->json(['state' => 204, 'message' => 'La configuración que usted desea crear ya existe.']);
-            }
-
-            $hotel = $this->hotels::find($hotelId);
-            if (!$hotel) {
-                return response()->json(['state' => 204, 'message' => 'El hotel no existe.']);
-            }
-
-            $roomsHotel = $this->hotelRoomConfigurations::where('hotel_id', $hotelId)->sum('amont');
-            $configurationRooms = $amount + $roomsHotel;
-
-            if ($hotel->rooms < $configurationRooms) {
-                return response()->json(['state' => 204, 'message' => 'La cantidad de cuartos configurados no pueden ser mayores a los creados para este hotel']);
-            }
-
-            $this->hotelRoomConfigurations::create([
-                'hotel_id' => $hotelId,
-                'room_type_id'         => $roomTypeId,
-                'acommodation_type_id' => $accommodationId,
-                'amont'                => $amount,
-                'status'               => true,
-                'created_at'           => now(),
-                'updated_at'           => now()
-            ]);
-
-            return response()->json(['state' => 200, 'message' => 'La configuracion del hotel fue creada con exito']);
-        } catch (Exception $e) {
-            Log::info("message error: " . $e->getMessage());
-            return response()->json(['state' => 500, 'message' => 'Hubo algún inconveniente creando la configuración del hotel']);
+        if ($invalidAccommodation) {
+            return response()->json(['message' => 'La acomodación no esta configurada al tipo de habitación.']);
         }
+
+        $duplicateConfig = $this->hotelRoomConfigurations::where([
+            ['hotel_id', $hotelId],
+            ['room_type_id', $roomTypeId],
+            ['acommodation_type_id', $accommodationId]
+        ])->exists();
+
+        if ($duplicateConfig) {
+            return response()->json(['message' => 'La configuración que usted desea crear ya existe.']);
+        }
+
+        $hotel = $this->hotels::find($hotelId);
+        if (!$hotel) {
+            return response()->json(['message' => 'El hotel no existe.']);
+        }
+
+        $roomsHotel = $this->hotelRoomConfigurations::where('hotel_id', $hotelId)->sum('room_number');
+        $configurationRooms = $amount + $roomsHotel;
+
+        if ($hotel->rooms_capacity < $configurationRooms) {
+            return response()->json(['message' => 'La cantidad de cuartos configurados no pueden ser mayores a los creados para este hotel']);
+        }
+
+        $this->hotelRoomConfigurations::create([
+            'hotel_id'             => $hotelId,
+            'room_type_id'         => $roomTypeId,
+            'acommodation_type_id' => $accommodationId,
+            'room_number'          => $amount,
+            'floor'                => 1,
+            'created_at'           => now(),
+            'updated_at'           => now()
+        ]);
+
+        return response()->json(['message' => 'La configuracion de su hotel fue creada con exito'], Response::HTTP_OK);
     }
 
     /**
@@ -175,9 +152,10 @@ class HotelRepository implements HotelInterface
      * @return \Illuminate\Http\Response
      * @param $id
      */
-    public function cities(int $id)
+    public function cities()
     {
-        return Cities::where('country_id', $id)->get();
+        $country = Countries::where('name', 'Colombia')->first();
+        return Cities::where('country_id', $country->id)->get();
     }
 
     /**
@@ -187,7 +165,7 @@ class HotelRepository implements HotelInterface
      */
     public function roomTypes()
     {
-        return RoomTypes::where('status', true)->get();
+        return RoomTypes::all();
     }
 
     /**
@@ -199,7 +177,7 @@ class HotelRepository implements HotelInterface
     public function accommodationTypes(int $roomTypeId)
     {
         return RoomTypeAccommodation::join('acommodation_types AS at', 'room_type_accommodations.accommodation_type_id', '=', 'at.id')
-            ->where([['at.status', true], ['room_type_accommodations.room_type_id', $roomTypeId]])
+            ->where('room_type_accommodations.room_type_id', $roomTypeId)
             ->get();
     }
 }

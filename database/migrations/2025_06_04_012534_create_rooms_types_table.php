@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('room_types', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name', 255)->comment('Nombre del tipo de cuarto');
-            $table->boolean('status')->default(true)->coclsmment('Nombre del tipo de cuarto');
+            $table->string('name')->comment('Nombre del tipo de cuarto');
+            $table->text('description')->comment('Descripcion del tipo de cuarto');
             $table->timestamps();
         });
     }

@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class AcommodationTypes extends Model
 {
     use HasFactory;
-    protected $fillable = [ 'name', 'status' ];
-    protected $guarded = ['id'];
+    protected $fillable = [ 'name' ];
+    public $timestamps = true;
 }

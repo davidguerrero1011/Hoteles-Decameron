@@ -9,7 +9,7 @@ class Cities extends Model
 {
     use HasFactory;
     protected $fillable = [ 'name', 'country_id', 'status' ];
-    protected $guarded = ['id'];
+    public $timestamps = true;
 
 
     public function hotel()

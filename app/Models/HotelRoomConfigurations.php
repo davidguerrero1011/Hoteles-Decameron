@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class HotelRoomConfigurations extends Model
 {
     use HasFactory;
-    protected $fillable = ['hotel_id', 'room_type_id', 'acommodation_type_id', 'amont', 'status'];
-    protected $guarded = ['id'];
+    protected $fillable = ['hotel_id', 'room_type_id', 'acommodation_type_id', 'room_number', 'floor'];
+    public $timestamps = true;
 }

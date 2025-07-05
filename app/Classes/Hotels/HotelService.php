@@ -2,14 +2,13 @@
 
 namespace App\Classes\Hotels;
 
-use App\Http\Requests\Hotels\HotelRequest;
-use App\Repositories\Hotels\HotelRepository;
+use App\Interfaces\Hotels\HotelInterface;
 use Illuminate\Http\Request;
 
 class HotelService
 {
 
-    public function __construct(public HotelRepository $hotelRepository) {}
+    public function __construct(protected HotelInterface $hotelInterface) {}
 
     /**
      * Display a listing of the resource.
@@ -18,16 +17,16 @@ class HotelService
      */
     public function index()
     {
-        return $this->hotelRepository->index();
+        return $this->hotelInterface->index();
     }
 
     /**
      * store a resource.
      *
      */
-    public function store(Request $request)
+    public function store(array $request)
     {
-        return $this->hotelRepository->store($request);
+        return $this->hotelInterface->store($request);
     }
 
     /**
@@ -36,9 +35,12 @@ class HotelService
      * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        return $this->hotelRepository->show($id);
+        if (empty($id) || !is_numeric($id)) {
+            return response()->json(['El ID '. $id . ' suministrado, no es un recurso disponible en este momento, reviselo']);
+        }
+        return $this->hotelInterface->show($id);
     }
 
     /**
@@ -47,9 +49,12 @@ class HotelService
      * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function update(HotelRequest $request, int $id)
+    public function update(array $request, int $id)
     {
-        return $this->hotelRepository->update($request, $id);
+        if (empty($id) || !is_numeric($id)) {
+            return response()->json(['El ID '. $id . ' suministrado, no es un recurso disponible en este momento, reviselo']);
+        }
+        return $this->hotelInterface->update($request, $id);
     }
 
     /**
@@ -59,7 +64,10 @@ class HotelService
      */
     public function destroy(int $id)
     {
-        return $this->hotelRepository->destroy($id);
+        if (empty($id) || !is_numeric($id)) {
+            return response()->json(['El ID '. $id . ' suministrado, no es un recurso disponible en este momento, reviselo']);
+        }
+        return $this->hotelInterface->destroy($id);
     }
 
     /**
@@ -70,7 +78,7 @@ class HotelService
      */
     public function assign(Request $request)
     {
-        return $this->hotelRepository->assign($request);
+        return $this->hotelInterface->assign($request);
     }
 
     /**
@@ -79,9 +87,9 @@ class HotelService
      * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function cities(int $id)
+    public function cities()
     {
-        return $this->hotelRepository->cities($id);
+        return $this->hotelInterface->cities();
     }
 
     /**
@@ -91,7 +99,7 @@ class HotelService
      */
     public function roomTypes()
     {
-        return $this->hotelRepository->roomTypes();
+        return $this->hotelInterface->roomTypes();
     }
 
     /**
@@ -102,6 +110,9 @@ class HotelService
      */
     public function accommodationTypes(int $roomTypeId)
     {
-        return $this->hotelRepository->accommodationTypes($roomTypeId);
+        if (empty($roomTypeId) || !is_numeric($roomTypeId)) {
+            return response()->json(['El ID '. $roomTypeId . ' suministrado, no es un recurso disponible en este momento, reviselo']);
+        }
+        return $this->hotelInterface->accommodationTypes($roomTypeId);
     }
 }
