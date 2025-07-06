@@ -29,8 +29,3 @@ Route::prefix('hotels')->group(function() {
     Route::get('/room-types', [HotelController::class, 'roomTypes'])->name('hotels.room.types');
     Route::get('/accommodation-types/{roomTypeId}', [HotelController::class, 'accommodationTypes'])->name('hotels.accommodation.types');
 });
-
-Route::get('/cors-test', function () {
-    return response()->json(['ok' => true]);
-});
-
