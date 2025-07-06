@@ -36,17 +36,7 @@ class HotelRepository implements HotelInterface
      */
     public function store(array $request)
     {
-        $existHotel = $this->hotels::where(function ($query) use ($request) {
-            $query->where('name', 'LIKE', '%' . $request['name'] . '%')
-                ->orWhere('nit', 'LIKE', '%' . $request['nit'] . '%');
-        })->exists();
-
-        if ($existHotel) {
-            return response()->json(['message' => 'Este hotel con nombre o nit ya existe, debe crear uno nuevo.'], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-        
         $request['status'] = isset($request['status']) && $request['status'] == 1 ? 1 : 0;
-        Log::info("status final: " . $request['status']);
         return Hotels::create($request);
     }
 

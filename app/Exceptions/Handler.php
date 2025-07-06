@@ -45,8 +45,7 @@ class Handler extends ExceptionHandler
                                         ], 422);
             }
 
-            // return response()->json(['message' => app()->isLocal() ? $e->getMessage() : 'Error en el servidor'], 500);
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => app()->isLocal() ? $e->getMessage() : 'Error en el servidor'], 500);
         }
 
         return parent::render($request, $e);

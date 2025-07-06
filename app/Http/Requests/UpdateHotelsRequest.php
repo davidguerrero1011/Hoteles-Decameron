@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Hotels;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class HotelRequest extends FormRequest
+class UpdateHotelsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +23,12 @@ class HotelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'           => ['required', 'max:255', 'unique:hotels,name'],
-            'nit'            => ['required', 'max:10', 'unique:hotels,nit'],
+            'name'           => ['required', 'max:255', Rule::unique('hotels', 'name')->ignore($this->route('id'))],
+            'nit'            => ['required', 'max:10', Rule::unique('hotels', 'nit')->ignore($this->route('id'))],
             'address'        => ['required', 'max:255'],
             'city_id'        => 'required',
             'rooms_capacity' => ['required', 'integer', 'min:0'],
-            'email'          => ['required', 'email', 'unique:hotels,email'],
+            'email'          => ['required', 'email', Rule::unique('hotels', 'email')->ignore($this->route('id'))],
             'phone'          => ['required', 'max:10'],
             'status'         => ['sometimes', 'boolean']
         ];

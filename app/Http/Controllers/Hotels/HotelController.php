@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Hotels;
 use App\Classes\Hotels\HotelService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Hotels\HotelRequest;
+use App\Http\Requests\UpdateHotelsRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,7 +48,7 @@ class HotelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(HotelRequest $request, int $id)
+    public function update(UpdateHotelsRequest $request, int $id)
     {
         $this->hotel->update($request->validated(), $id);
         return response()->json(['message' => 'Hotel con ID '. $id .' actualizado de manera exitosa'], Response::HTTP_OK);
