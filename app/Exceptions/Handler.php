@@ -3,7 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
 use TypeError;
 
@@ -30,7 +30,7 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e) : JsonResponse
+    public function render($request, Throwable $e) : SymfonyResponse
     {
         if ($request->expectsJson()) {
             
